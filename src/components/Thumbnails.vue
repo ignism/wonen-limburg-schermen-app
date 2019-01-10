@@ -1,7 +1,7 @@
 <template>
   <div class="thumbnails w-1/5 px-4 flex flex-wrap h-full overflow-scroll">
-    <div class="w-full h-32 bg-red mb-8" v-for="(background, index) in thumbnails" :key="index">
-      <div class=" thumbnail w-full h-full" @click="loadVideo(index)" :style="{ backgroundImage: 'url(' + background + ')' }"></div>
+    <div class="w-full h-32 bg-red mb-8" v-for="(video, index) in videos" :key="index">
+      <div class=" thumbnail w-full h-full" @click="loadVideo(index, true)" :style="{ backgroundImage: 'url(' + video.thumbnail + ')' }"></div>
     </div>
   </div>
 </template>
@@ -18,38 +18,42 @@ export default {
   },
   data () {
     return {
+      codes: [],
+      thumbnails: [],
       videos: [],
-      thumbnails: []
     }
   },
   methods: {
-    getThumbnails() {
-      for (let i = 0; i < this.videos.length; i++) {
-        youtube.getVideoByID(this.videos[i].id).then(video => {
-          this.thumbnails.push(video.thumbnails.standard.url)
+    initVideos(){
+      for (let i = 0; i < this.codes.length; i++) {
+        youtube.getVideoByID(this.codes[i].id).then(result => {
+          let video = {
+            id: this.codes[i].id,
+            thumbnail: result.thumbnails.standard.url
+          }
+          
+          this.videos.push(video)
         })
       }
     },
-    loadVideo(index) {
-      this.$parent.$refs.videoPlayer.getVideoUrl(this.videos[index].id)
-    }
+    loadVideo(index, onClick) {
+      this.$parent.$refs.videoPlayer.loadVideo(this.videos[index].id, onClick)
+    },
   },
   mounted() {
     let intervalId = setInterval(() => {
-      console.log('tick')
 
       if (store.state.initialized) {
-        console.log('initialized')
         window.clearInterval(intervalId)
 
         store.dispatch('getVideos').then((response) => {
           if (response) {
-            this.videos = response
-            this.getThumbnails()
+            this.codes = response
+            this.initVideos()
           }
         })
       }
-    })
+    }, 100)
   }
 }
 </script>
