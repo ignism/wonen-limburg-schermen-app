@@ -14,7 +14,7 @@
 import HeaderLogo from '@/components/HeaderLogo.vue'
 import VideoPlayer from '@/components/VideoPlayer.vue'
 import Thumbnails from '@/components/Thumbnails.vue'
-import axios from 'axios'
+import store from '@/store.js'
 
 export default {
   name: 'home',
@@ -29,11 +29,7 @@ export default {
       }
   },
   mounted() {
-    axios
-    .get('https://you-link.herokuapp.com/?url=https://www.youtube.com/watch?v=NlmlswjxEJw')
-    .then((response) => {
-        console.log(this.$refs.videoPlayer.setVideoUrl("urltje"))
-    })
+    store.dispatch('initVideos')
   }
 }
 </script>
