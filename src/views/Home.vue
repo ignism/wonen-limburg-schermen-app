@@ -2,9 +2,9 @@
   <div class="home">
     <header-logo msg="header"/>
 
-    <section class="wrapper flex flex-wrap mx-auto w-5/6">
+    <section class="wrapper flex flex-wrap mx-auto">
         <video-player ref="videoPlayer" msg="player" />
-        <thumbnails msg="sidebar"/>
+        <thumbnails ref="thumbnails" msg="sidebar"/>
     </section>
   </div>
 </template>
@@ -36,8 +36,7 @@ export default {
 
 <style>
 .wrapper {
-    margin-top: -80px;
-    height: calc(100vh - 16.666vw);
-    background: grey;
+    margin-top: -64px;
+    width: 83.333vw;
 }
 </style>
