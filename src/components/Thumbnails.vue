@@ -1,30 +1,30 @@
 <template>
   <div class="thumbnails relative">
-    <div class="scroll-up absolute bg-purple w-12 h-12 z-10" @click="scrollUp">
-      <img src="/images/arrow.svg" alt="">
+    <div class="scroll-up absolute bg-purple z-10" @click="scrollUp">
+      <img src="assets/images/arrow.svg" alt="">
     </div>
     <div class="thumbnails-wrapper px-4 flex flex-wrap overflow-scroll">
-
-
       <div class="w-full bg-red mb-8 relative" v-for="(video, index) in videos" :key="index">
-        <div
-          class="thumbnail w-full h-full"
-          @click="loadVideo(index, true)"
-          :style="{ backgroundImage: 'url(' + video.thumbnail + ')' }"
-        >
+        <div class="relative thumbnail w-full h-full" @click="loadVideo(index, true)">
+          <div class="background-wrapper w-full h-full overflow-hidden relative">
+            <div class="background w-full h-full ">
+              <img :src="video.thumbnail" alt="">
+            </div>
+            <!-- <div class="background" :style="{ backgroundImage: 'url(' + video.thumbnail + ')' }"></div> -->
+          </div>
           <div class="description p-2 bg-white absolute">
             <span class="font-bold">Title van deze video is lang</span>
             <br>
             <span>Saskia van Sanderhovenachter</span>
           </div>
-          <div class="indicator bg-white-75 text-purple h-full w-full flex flex-col justify-center">
+          <div class="absolute indicator pin-t pin-l bg-white-75 text-purple h-full w-full flex flex-col justify-center">
             <div class="text-center">speelt nu af</div>
           </div>
         </div>
       </div>
     </div>
-    <div class="scroll-down absolute bg-purple w-12 h-12 z-10" @click="scrollDown">
-      <img src="/images/arrow.svg" alt="">
+    <div class="scroll-down absolute bg-purple z-10" @click="scrollDown">
+      <img src="assets/images/arrow.svg" alt="">
     </div>
   </div>
 </template>
@@ -33,6 +33,7 @@
 import store from "@/store.js";
 import YouTube from "simple-youtube-api";
 const youtube = new YouTube("AIzaSyBT3erBppFscGZRzeDcVQh0y-FwZgzzGYU");
+import { tween, styler } from 'popmotion';
 
 export default {
   name: "Thumbnails",
@@ -88,15 +89,35 @@ export default {
 
       this.activate(index);
     },
+    getThumbHeight() {
+      let thumb = document.querySelector('.thumbnail')
+      return thumb.offsetHeight + 32
+    },
     scrollUp () {
       let wrapper = document.querySelector('.thumbnails-wrapper')
+      let thumb = document.querySelector('.thumbnail')
 
-      wrapper.scrollTop = wrapper.scrollTop - 100
+      let currPos = wrapper.scrollTop;
+      let toPos = currPos - (thumb.offsetHeight + 32)
+
+      const updateWrapper = v => (wrapper.scrollTop = v);
+
+      tween({ from: currPos, to: toPos, duration: 400 }).start({
+        update: updateWrapper
+      });
     },
     scrollDown () {
       let wrapper = document.querySelector('.thumbnails-wrapper')
+      let thumb = document.querySelector('.thumbnail')
 
-      wrapper.scrollTop = wrapper.scrollTop + 100
+      let currPos = wrapper.scrollTop;
+      let toPos = currPos + (thumb.offsetHeight + 32)
+
+      const updateWrapper = v => (wrapper.scrollTop = v);
+
+      tween({ from: currPos, to: toPos, duration: 400 }).start({
+        update: updateWrapper
+      });
     }
   },
   mounted() {
@@ -125,11 +146,23 @@ export default {
   height: calc((66.666vw - 2rem) * 9 / 16);
 }
 
+.thumbnails-wrapper::-webkit-scrollbar {
+    width: 0px;
+    height: 0px;
+    background: transparent; /* make scrollbar transparent */
+}
+
 .thumbnail {
-  background-size: cover;
-  background-position: center;
   cursor: pointer;
   height: 9.375vw;
+}
+
+.background {
+  width: 140%;
+  height: 140%;
+  position: relative;
+  top: -25%;
+  left: -20%;
 }
 
 .description {
@@ -151,10 +184,16 @@ export default {
   opacity: 1;
 }
 
+.scroll-up,
+.scroll-down {
+  width: 3vw;
+  height: 3vw;
+  left: 50%;
+  margin-left: -1.5vw;
+}
+
 .scroll-up {
   top: -1rem;
-  left: 50%;
-  margin-left: -1rem;
   box-shadow: -5px 10px 20px rgba(0, 0, 0, 0.25);
 }
 
@@ -165,8 +204,6 @@ export default {
 
 .scroll-down {
   bottom: -1rem;
-  left: 50%;
-  margin-left: -1rem;
   box-shadow: -5px 10px 20px rgba(0, 0, 0, 0.25);
 }
 

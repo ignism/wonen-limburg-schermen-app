@@ -16,12 +16,12 @@
     >{{ filterTime(duration) }}</div>
     <div class="controls absolute">
       <button class="btn btn-play" @click="togglePause">
-        <img v-if="isPaused" class="btn-icon" src="/images/play.svg">
-        <img v-else class="btn-icon" src="/images/pause.svg">
+        <img v-if="isPaused" class="btn-icon" src="assets/images/play.svg">
+        <img v-else class="btn-icon" src="assets/images/pause.svg">
       </button>
       <button class="btn btn-mute" @click="toggleMute">
-        <img v-if="isMuted" class="btn-icon" src="/images/sound_off.svg">
-        <img v-else class="btn-icon" src="/images/sound_on.svg">
+        <img v-if="isMuted" class="btn-icon" src="assets/images/sound_off.svg">
+        <img v-else class="btn-icon" src="assets/images/sound_on.svg">
       </button>
     </div>
   </div>

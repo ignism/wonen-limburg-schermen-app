@@ -1,10 +1,10 @@
 <template>
   <div class="header-logo">
     <div class="logo p-4 bg-white absolute z-10">
-      <img src="/images/logo.svg" alt="">
+      <img src="assets/images/logo.svg" alt="">
     </div>
     <div class="line absolute absolute z-20">
-      <img src="/images/line.svg" alt="" class="w-full">
+      <img src="assets/images/line.svg" alt="" class="w-full">
     </div>
   </div>
 </template>

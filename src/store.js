@@ -39,7 +39,7 @@ export default new Vuex.Store({
       return (context.state.videos[index].id)
     },
     initVideos(context) {
-        let url = 'http://wl-schermen.test/admin/videos.json'
+        let url = 'http://wl-schermen_INLINE.test/videos.json'
 
         axios.get(url).then((response) => {
             if (response.data.videos) {
