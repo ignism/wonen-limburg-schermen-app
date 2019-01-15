@@ -7,13 +7,7 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     initialized: false,
-    videos: [
-        '1',
-        '2',
-        '3',
-        '4',
-        '5'
-    ]
+    videos: []
   },
   mutations: {
 
@@ -23,7 +17,7 @@ export default new Vuex.Store({
       return context.state.videos
     },
     getVideo(context, index) {
-      return context.state.videos[index].id
+      return context.state.videos[index]
     },
     getNextVideo(context, id) {
       console.log(id)
@@ -36,10 +30,10 @@ export default new Vuex.Store({
       }
       index = index + 1;
       if (index > num -1) index = 0;
-      return (context.state.videos[index].id)
+      return (context.state.videos[index])
     },
     initVideos(context) {
-        let url = 'http://wl-schermen_INLINE.test/videos.json'
+        let url = 'http://wl-schermen.test/feed/videos.json'
 
         axios.get(url).then((response) => {
             if (response.data.videos) {

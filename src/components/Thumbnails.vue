@@ -4,7 +4,7 @@
       <img src="assets/images/arrow.svg" alt="">
     </div>
     <div class="thumbnails-wrapper px-4 flex flex-wrap overflow-scroll">
-      <div class="w-full bg-red mb-8 relative" v-for="(video, index) in videos" :key="index">
+      <div class="w-full bg-green-dark mb-8 relative" v-for="(video, index) in videos" :key="index">
         <div class="relative thumbnail w-full h-full" @click="loadVideo(index, true)">
           <div class="background-wrapper w-full h-full overflow-hidden relative">
             <div class="background w-full h-full ">
@@ -13,9 +13,9 @@
             <!-- <div class="background" :style="{ backgroundImage: 'url(' + video.thumbnail + ')' }"></div> -->
           </div>
           <div class="description p-2 bg-white absolute">
-            <span class="font-bold">Title van deze video is lang</span>
+            <span class="font-bold">{{ video.title }}</span>
             <br>
-            <span>Saskia van Sanderhovenachter</span>
+            <span>{{ video.name }}</span>
           </div>
           <div class="absolute indicator pin-t pin-l bg-white-75 text-purple h-full w-full flex flex-col justify-center">
             <div class="text-center">speelt nu af</div>
@@ -33,7 +33,7 @@
 import store from "@/store.js";
 import YouTube from "simple-youtube-api";
 const youtube = new YouTube("AIzaSyBT3erBppFscGZRzeDcVQh0y-FwZgzzGYU");
-import { tween, styler } from 'popmotion';
+import { tween } from 'popmotion';
 
 export default {
   name: "Thumbnails",
@@ -42,18 +42,34 @@ export default {
   },
   data() {
     return {
-      codes: [],
+      feed: [],
       thumbnails: [],
       videos: []
     };
   },
   methods: {
     initVideos() {
-      for (let i = 0; i < this.codes.length; i++) {
-        youtube.getVideoByID(this.codes[i].id).then(result => {
+      for (let i = 0; i < this.feed.length; i++) {
+        youtube.getVideoByID(this.feed[i].id).then(result => {
+          console.log(result)
+
+          let thumbnail
+          if (result.thumbnails.high) {
+            thumbnail = result.thumbnails.high.url
+          } else if (result.thumbnails.standard) {
+            thumbnail = result.thumbnails.standard.url
+          } else if (result.thumbnails.medium) {
+            thumbnail = result.thumbnails.medium.url
+          } else {
+            thumbnail = result.thumbnails.default.url
+          }
+
           let video = {
-            id: this.codes[i].id,
-            thumbnail: result.thumbnails.standard.url
+            id: this.feed[i].id,
+            title: this.feed[i].title,
+            thumbnail: thumbnail,
+            name: this.feed[i].name,
+            function: this.feed[i].function
           };
 
           this.videos.push(video);
@@ -67,7 +83,7 @@ export default {
         thumb.classList.remove("active");
       });
 
-      this.$parent.$refs.videoPlayer.loadVideo(this.videos[index].id, onClick);
+      this.$parent.$refs.videoPlayer.loadVideo(this.videos[index], onClick);
     },
     activate(index) {
       let thumbs = Array.from(document.getElementsByClassName("thumbnail"));
@@ -127,7 +143,7 @@ export default {
 
         store.dispatch("getVideos").then(response => {
           if (response) {
-            this.codes = response;
+            this.feed = response;
             this.initVideos();
           }
         });

@@ -4,10 +4,10 @@
       <d-player ref="player" :options="options" @ended="playbackEnded" @timeupdate="timeUpdate"/>
     </div>
     <div class="title px-6 py-8 absolute bg-white">
-      <h1 class="text-4xl">Titel van Video</h1>
+      <h1 class="text-4xl">{{ currVideo.title }}</h1>
       <div class="persona px-4 py-2 text-white bg-purple absolute">
-        <span class="text-xl">Naam</span>
-        <br>Functie
+        <span class="text-xl">{{ currVideo.name }}</span>
+        <br>{{ currVideo.function }}
       </div>
     </div>
     <div class="progress absolute pin-t pin-l h-1 mx-4 bg-purple z-50" :style="{ width: progressWidth }"></div>
@@ -137,10 +137,11 @@ export default {
         return "00:00";
       }
     },
-    loadVideo(code, sound) {
+    loadVideo(video, sound) {
+      console.log(video)
       let url =
         "https://you-link.herokuapp.com/?url=https://www.youtube.com/watch?v=" +
-        code;
+        video.id;
 
       axios.get(url).then(response => {
         console.log("got response");
@@ -159,10 +160,10 @@ export default {
 
         if (videoUrl !== "") {
           this.setVideoUrl(videoUrl);
-          this.currVideo = code;
+          this.currVideo = video;
 
           setTimeout(() => {
-            this.$parent.$refs.thumbnails.activateByID(code);
+            this.$parent.$refs.thumbnails.activateByID(video.id);
 
             if (sound) {
               this.playWithSound();
