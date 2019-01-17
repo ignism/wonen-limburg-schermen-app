@@ -10,9 +10,9 @@
         <br>{{ currVideo.function }}
       </div>
     </div>
-    <div class="progress absolute pin-t pin-l h-1 mx-4 bg-purple z-50" :style="{ width: progressWidth }"></div>
+    <div class="progress absolute pin-t pin-l h-2 mx-4 bg-purple z-40" :style="{ width: progressWidth }"></div>
     <div
-      class="duration absolute mx-4 p-2 text-sm pin-t pin-r bg-white-75 z-40"
+      class="duration absolute mx-4 py-2 px-3 text-sm pin-t pin-r text-lg bg-white-75 z-50"
     >{{ filterTime(duration) }}</div>
     <div class="controls absolute">
       <button class="btn btn-play" @click="togglePause">
@@ -213,8 +213,18 @@ export default {
 }
 
 .controls {
-  bottom: -1.525vw;
+  bottom: -3vw;
   right: 3.125vw;
+}
+
+.btn {
+  position: relative;
+  left: 0;
+  top: 0;
+}
+
+.btn:nth-child(2) {
+  left: -10px;
 }
 
 .btn:focus {
@@ -222,9 +232,8 @@ export default {
 }
 
 .btn-icon {
-  width: 4vw;
-  height: 3vw;
-  transform: scale(1.5);
+  width: 6vw;
+  height: 6vw;
 }
 
 .dplayer-controller,

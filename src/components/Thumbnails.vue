@@ -18,7 +18,7 @@
             <span>{{ video.name }}</span>
           </div>
           <div class="absolute indicator pin-t pin-l bg-white-75 text-purple h-full w-full flex flex-col justify-center">
-            <div class="text-center">speelt nu af</div>
+            <div class="text-center text-xl">SPEELT NU AF</div>
           </div>
         </div>
       </div>
@@ -214,7 +214,7 @@ export default {
 }
 
 .scroll-up img {
-  transform: scale(0.6) translate(0, -6px);
+  transform: scale(0.5) translate(0, -9px);
   transform-origin: center;
 }
 
@@ -224,7 +224,7 @@ export default {
 }
 
 .scroll-down img {
-  transform: scale(0.6) translate(0, -6px) rotate(180deg);
+  transform: scale(0.5) translate(0, -9px) rotate(180deg);
   transform-origin: center;
 }
 </style>

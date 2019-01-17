@@ -36,7 +36,7 @@ export default {
 
 <style>
 .wrapper {
-    margin-top: -64px;
+    margin-top: 0;
     width: 83.333vw;
 }
 </style>
