@@ -34,7 +34,7 @@ export default {
 
     .line {
       left: 0;
-      top: 7.5vw;
+      top: 6vw;
       width: 14.5vw;
     }
 </style>
