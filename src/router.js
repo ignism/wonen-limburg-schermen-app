@@ -13,5 +13,10 @@ export default new Router({
       name: 'home',
       component: Home
     },
+    {
+      path: '/wl-schermen/',
+      name: 'home',
+      component: Home
+    },
   ]
 })

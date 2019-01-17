@@ -3,7 +3,7 @@
     <div class="dplayer-wrapper bg-black">
       <d-player ref="player" :options="options" @ended="playbackEnded" @timeupdate="timeUpdate"/>
     </div>
-    <div class="title px-6 py-8 absolute bg-white">
+    <div class="title px-6 py-8 absolute bg-white" :style="{ left: leftPosition }">
       <h1 class="text-4xl">{{ currVideo.title }}</h1>
       <div class="persona px-4 py-2 text-white bg-purple absolute">
         <span class="text-xl">{{ currVideo.name }}</span>
@@ -43,6 +43,7 @@ export default {
   },
   data() {
     return {
+      leftPosition: '10%',
       currVideo: String,
       isPaused: false,
       isMuted: true,
@@ -61,6 +62,10 @@ export default {
     }
   },
   methods: {
+    getLeftPosition() {
+      let randomLeft = Math.random() * 15 + 5 + '%'
+      return randomLeft
+    },
     mute() {
       const player = this.$refs.player.dp;
       player.volume(0);
@@ -161,6 +166,7 @@ export default {
         if (videoUrl !== "") {
           this.setVideoUrl(videoUrl);
           this.currVideo = video;
+          this.leftPosition = this.getLeftPosition()
 
           setTimeout(() => {
             this.$parent.$refs.thumbnails.activateByID(video.id);
@@ -203,8 +209,8 @@ export default {
 
 .title {
   bottom: -2rem;
-  left: 20%;
   box-shadow: -5px 10px 20px rgba(0, 0, 0, 0.1);
+  transition: left 800ms ease;
 }
 
 .persona {
