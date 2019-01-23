@@ -12,7 +12,7 @@
             </div>
             <!-- <div class="background" :style="{ backgroundImage: 'url(' + video.thumbnail + ')' }"></div> -->
           </div>
-          <div class="description p-2 bg-white absolute">
+          <div v-if="video.title" class="description p-2 bg-white absolute">
             <span class="font-bold">{{ video.title }}</span>
             <br>
             <span>{{ video.name }}</span>

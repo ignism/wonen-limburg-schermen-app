@@ -3,7 +3,7 @@
     <div class="dplayer-wrapper bg-black">
       <d-player ref="player" :options="options" @ended="playbackEnded" @timeupdate="timeUpdate"/>
     </div>
-    <div class="title px-6 py-8 absolute bg-white" :style="{ left: leftPosition }">
+    <div v-if="currVideo.title" class="title px-6 py-8 absolute bg-white" :style="{ left: leftPosition }">
       <h1 class="text-4xl">{{ currVideo.title }}</h1>
       <div class="persona px-4 py-2 text-white bg-purple absolute">
         <span class="text-xl">{{ currVideo.name }}</span>
@@ -208,7 +208,7 @@ export default {
 }
 
 .title {
-  bottom: -2rem;
+  bottom: -2.75rem;
   box-shadow: -5px 10px 20px rgba(0, 0, 0, 0.1);
   transition: left 800ms ease;
 }

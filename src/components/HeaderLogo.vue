@@ -1,9 +1,9 @@
 <template>
   <div class="header-logo">
-    <div class="logo p-4 absolute z-10">
+    <div class="logo p-4 absolute z-20">
       <img src="assets/images/logo-box.svg" alt="">
     </div>
-    <div class="line absolute absolute z-20">
+    <div class="line absolute absolute z-10">
       <img src="assets/images/line.svg" alt="" class="w-full">
     </div>
   </div>
