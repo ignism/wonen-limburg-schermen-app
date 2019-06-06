@@ -49,6 +49,7 @@ export default {
   },
   methods: {
     initVideos() {
+
       for (let i = 0; i < this.feed.length; i++) {
         youtube.getVideoByID(this.feed[i].id).then(result => {
           console.log(result)
@@ -72,7 +73,8 @@ export default {
             function: this.feed[i].function
           };
 
-          this.videos.push(video);
+          // this.videos[i] = video;
+          this.videos.push(video)
         });
       }
     },
@@ -84,6 +86,18 @@ export default {
       });
 
       this.$parent.$refs.videoPlayer.loadVideo(this.videos[index], onClick);
+    },
+    getNextVideoId(id) {
+      let index = 0;
+      let num = this.videos.length;
+      for (let i = 0; i < this.videos.length; i++) {
+        if (id === this.videos[i].id) {
+          index = i
+        }
+      }
+      index = index + 1;
+      if (index > num -1) index = 0;
+      return (this.videos[index].id)
     },
     activate(index) {
       let thumbs = Array.from(document.getElementsByClassName("thumbnail"));
@@ -145,6 +159,34 @@ export default {
           if (response) {
             this.feed = response;
             this.initVideos();
+
+            // for (let i = 0; i < this.feed.length; i++) {
+            //   youtube.getVideoByID(this.feed[i].id).then(result => {
+            //     console.log(result)
+
+            //     let thumbnail
+            //     if (result.thumbnails.high) {
+            //       thumbnail = result.thumbnails.high.url
+            //     } else if (result.thumbnails.standard) {
+            //       thumbnail = result.thumbnails.standard.url
+            //     } else if (result.thumbnails.medium) {
+            //       thumbnail = result.thumbnails.medium.url
+            //     } else {
+            //       thumbnail = result.thumbnails.default.url
+            //     }
+
+            //     let video = {
+            //       id: this.feed[i].id,
+            //       title: this.feed[i].title,
+            //       thumbnail: thumbnail,
+            //       name: this.feed[i].name,
+            //       function: this.feed[i].function
+            //     };
+
+            //     this.videos[i] = video;
+            //     // this.videos.push(video)
+            //   });
+            // }
           }
         });
       }

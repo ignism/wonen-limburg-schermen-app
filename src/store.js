@@ -19,6 +19,17 @@ export default new Vuex.Store({
     getVideo(context, index) {
       return context.state.videos[index]
     },
+    getVideoById(context, id) {
+      let index = 0;
+      
+      for (let i = 0; i < context.state.videos.length; i++) {
+        if (id === context.state.videos[i].id) {
+          index = i
+        }
+      }
+
+      return (context.state.videos[index])
+    },
     getNextVideo(context, id) {
       console.log(id)
       let index = 0;
@@ -33,8 +44,8 @@ export default new Vuex.Store({
       return (context.state.videos[index])
     },
     initVideos(context) {
-        // let url = 'http://onzebuurtinbeeld.nl/wl-schermen/feed/videos.json'
-        let url = 'http://wl-schermen_inline.test/grav/videos.json'
+        let url = 'http://onzebuurtinbeeld.nl/wl-schermen/feed/videos.json'
+        // let url = 'http://wl-schermen.test/feed/videos.json'
 
         axios.get(url).then((response) => {
             if (response.data.videos) {

@@ -1,18 +1,32 @@
 <template>
   <div class="video-player px-4 relative z-30">
     <div class="dplayer-wrapper bg-black">
-      <d-player ref="player" :options="options" @ended="playbackEnded" @timeupdate="timeUpdate"/>
+      <d-player ref="player" @error="errorHandling" :options="options" @ended="playbackEnded" @timeupdate="timeUpdate"/>
     </div>
-    <div v-if="currVideo.title" class="title px-6 py-8 absolute bg-white" :style="{ left: leftPosition }">
+    <div
+      v-if="currVideo.title"
+      class="title px-6 py-8 absolute bg-white"
+      :style="{ left: leftPosition }"
+    >
       <h1 class="text-4xl">{{ currVideo.title }}</h1>
       <div v-if="currVideo.name" class="persona px-4 py-2 text-white bg-purple absolute">
         <span class="text-xl">{{ currVideo.name }}</span>
-        <br>{{ currVideo.function }}
+        <br>
+        {{ currVideo.function }}
       </div>
     </div>
-    <div id="progress-bar" class="progress-background absolute pin-t pin-l pin-r h-2 ml-4 mr-20 z-50">
-      <progress-dot ref="dot" step="0.01" @input="draggingProgress" @change="changeProgress" v-model="progressValue" class="absolute pin z-50 w-full p-0">
-      </progress-dot>
+    <div
+      id="progress-bar"
+      class="progress-background absolute pin-t pin-l pin-r h-2 ml-4 mr-20 z-50"
+    >
+      <progress-dot
+        ref="dot"
+        step="0.01"
+        @input="draggingProgress"
+        @change="changeProgress"
+        v-model="progressValue"
+        class="absolute pin z-50 w-full p-0"
+      ></progress-dot>
     </div>
     <div
       class="duration absolute mx-4 py-2 px-3 w-16 text-sm pin-t pin-r text-lg bg-white-75 z-40"
@@ -22,10 +36,19 @@
         <img v-if="isPaused" class="btn-icon" src="assets/images/play.svg">
         <img v-else class="btn-icon" src="assets/images/pause.svg">
       </button>
-      <button class="btn btn-volume" @click="toggleVolume">
+      <button class="btn btn-volume" @click="toggleMute">
         <img v-if="isMuted" class="btn-icon" src="assets/images/sound_off.svg">
         <img v-else class="btn-icon" src="assets/images/sound_on.svg">
-          <volume class="volume-slider" min="0" max="1" step="0.1" @input="draggingVolume" @change="changeVolume" v-model="currVolume" :class="{active: isVolume}"></volume>
+        <!-- <volume
+          class="volume-slider"
+          min="0"
+          max="1"
+          step="0.1"
+          @input="draggingVolume"
+          @change="changeVolume"
+          v-model="currVolume"
+          :class="{active: isVolume}"
+        ></volume> -->
       </button>
     </div>
   </div>
@@ -37,15 +60,15 @@ import "vue-dplayer/dist/vue-dplayer.css";
 import axios from "axios";
 import store from "@/store.js";
 // import posed from 'vue-pose';
-import RangeSlider from 'vue-range-slider'
-import 'vue-range-slider/dist/vue-range-slider.css'
+import RangeSlider from "vue-range-slider";
+import "vue-range-slider/dist/vue-range-slider.css";
 
 export default {
   name: "VideoPlayer",
   components: {
     "d-player": VueDPlayer,
     "progress-dot": RangeSlider,
-    "volume": RangeSlider
+    // volume: RangeSlider
   },
   props: {
     msg: String
@@ -57,7 +80,7 @@ export default {
       progressValue: 0,
       isDragging: false,
       dragTime: 0,
-      leftPosition: '10%',
+      leftPosition: "10%",
       currVideo: String,
       isPaused: false,
       isMuted: true,
@@ -70,58 +93,62 @@ export default {
     };
   },
   computed: {
-    progressWidth: function () {
-      let percentage = parseInt(this.currTime/this.duration * 10000) / 100;
+    progressWidth: function() {
+      let percentage = parseInt((this.currTime / this.duration) * 10000) / 100;
       // return 'calc(' + percentage + '% - ' + percentage * 0.02 + 'rem)'
-      return percentage + '%'
+      return percentage + "%";
     }
   },
   methods: {
+    errorHandling() {
+      console.log('retrying')
+      this.loadVideo(this.currVideo, false)
+    },
     draggingVolume() {
-      const player = this.$refs.player.dp
+      const player = this.$refs.player.dp;
 
       if (this.currVolume == 0) {
         this.isMuted = true;
-        console.log(this.currVolume)
+        console.log(this.currVolume);
       } else {
         this.isMuted = false;
       }
 
-      player.volume(this.currVolume)
+      player.volume(this.currVolume);
     },
     changeVolume() {
-      const player = this.$refs.player.dp
+      const player = this.$refs.player.dp;
 
-      player.volume(this.currVolume)
+      player.volume(this.currVolume);
     },
     draggingProgress() {
-      this.isDragging = true
+      this.isDragging = true;
     },
     changeProgress() {
-      this.isDragging = false
-      
-      const player = this.$refs.player.dp
+      this.isDragging = false;
 
-      let time = this.progressValue / 100 * this.duration
-      console.log(time)
+      const player = this.$refs.player.dp;
 
-      player.seek(time)
+      let time = (this.progressValue / 100) * this.duration;
+      console.log(time);
+
+      player.seek(time);
     },
     updateDragPosition(event) {
-      let percentage = parseFloat(event) / 100
-      let time = this.duration * percentage
+      let percentage = parseFloat(event) / 100;
+      let time = this.duration * percentage;
 
       if (time) {
-        this.dragTime = time
+        this.dragTime = time;
       }
     },
     callback(event) {
-      console.log('callbeck test')
-      console.log(event)
+      console.log("callbeck test");
+      console.log(event);
     },
     getLeftPosition() {
-      let randomLeft = Math.random() * 15 + 5 + '%'
-      return randomLeft
+      let randomLeft = Math.random() * 15 + 5 + "%";
+      return randomLeft;
     },
     mute() {
       const player = this.$refs.player.dp;
@@ -170,6 +197,7 @@ export default {
     },
     toggleVolume() {
       this.isVolume = !this.isVolume;
+      
     },
     toggleMute() {
       this.isMuted = !this.isMuted;
@@ -182,13 +210,21 @@ export default {
     },
     setVideoUrl(url) {
       const player = this.$refs.player.dp;
-      player.switchVideo({
-        url: url
-      });
+      try {
+        player.switchVideo({
+          url: url
+        });
+        console.log('switched')
+      } catch (error) {
+        console.log(error)
+      }
     },
     playbackEnded() {
-      store.dispatch("getNextVideo", this.currVideo).then(response => {
+      let tid = this.$parent.$refs.thumbnails.getNextVideoId(this.currVideo.id)
+
+      store.dispatch("getVideoById", tid).then(response => {
         this.currVideo = response;
+        console.log(this.currVideo.id)
         this.loadVideo(response, false);
       });
     },
@@ -197,13 +233,14 @@ export default {
       this.duration = player.video.duration;
       this.currTime = player.video.currentTime;
 
-      if (this.isDragging == false){
-        this.progressValue= parseInt(this.currTime / this.duration * 10000) / 100
+      if (this.isDragging == false) {
+        this.progressValue =
+          parseInt((this.currTime / this.duration) * 10000) / 100;
       }
     },
     filterTime(seconds) {
       if (seconds) {
-        seconds = parseInt(seconds)
+        seconds = parseInt(seconds);
         let remainder = seconds % 60.0;
         remainder = remainder < 10 ? "0" + remainder : remainder;
         let minutes = (seconds - remainder) / 60;
@@ -215,10 +252,11 @@ export default {
       }
     },
     loadVideo(video, sound) {
-      console.log(video)
-      let url =
-        "https://you-link.herokuapp.com/?url=https://www.youtube.com/watch?v=" +
-        video.id;
+      console.log(video);
+      // let url = "http://wl-schermen_INLINE.test/ytdl/getvideo.php?videoid=" + video.id + "&type=Download&format=ipad"
+
+      // let url = "http://wl-schermen.test/yt-link.php?id=" + video.id;
+      let url = "http://onzebuurtinbeeld.nl/wl-schermen/yt-link.php?id=" + video.id;
 
       axios.get(url).then(response => {
         console.log("got response");
@@ -227,24 +265,25 @@ export default {
         let videoUrl = "";
 
         feeds.forEach(video => {
-          let type = video.type.split(";");
-          if (type[0] === "video/mp4") {
+          console.log(video);
+
+          if (video.mime === "video/mp4") {
             videoUrl = video.url;
           }
         });
 
         console.log(videoUrl);
-
+        
         if (videoUrl !== "") {
           this.setVideoUrl(videoUrl);
           this.currVideo = video;
-          this.leftPosition = this.getLeftPosition()
+          this.leftPosition = this.getLeftPosition();
 
           setTimeout(() => {
-            this.$parent.$refs.thumbnails.activateByID(video.id);
-            this.isDragging = false
-            this.dragPosition = '0%'
-            this.dragTime = 0
+              this.$parent.$refs.thumbnails.activateByID(video.id);
+            this.isDragging = false;
+            this.dragPosition = "0%";
+            this.dragTime = 0;
 
             if (sound) {
               this.playWithSound();
@@ -274,7 +313,6 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style>
-
 .btn-volume {
   position: relative;
 }
@@ -302,7 +340,7 @@ export default {
 }
 
 .volume-slider::after {
-  content: '';
+  content: "";
   position: absolute;
   left: 34px;
   top: 100%;
@@ -339,7 +377,6 @@ export default {
 }
 
 .range-slider-knob {
-
 }
 
 .video-player {
@@ -347,11 +384,11 @@ export default {
 }
 
 .dplayer-wrapper {
-  height: calc((66.666vw - 2rem)*9/16);
+  height: calc((66.666vw - 2rem) * 9 / 16);
 }
 
 .title {
-  bottom: -2.75rem;
+  bottom: -4.75rem;
   box-shadow: -5px 10px 20px rgba(0, 0, 0, 0.1);
   transition: left 800ms ease;
 }
