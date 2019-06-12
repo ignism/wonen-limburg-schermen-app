@@ -1,7 +1,17 @@
 <template>
   <div class="video-player px-4 relative z-30">
     <div class="dplayer-wrapper bg-black">
-      <d-player ref="player" @error="errorHandling" :options="options" @ended="playbackEnded" @timeupdate="timeUpdate"/>
+      <!-- <d-player ref="player" @error="errorHandling" :options="options" @ended="playbackEnded" @timeupdate="timeUpdate"/> -->
+      <youtube
+        :video-id="currVideo.id"
+        ref="youtube"
+        @ended="playbackEnded"
+        @paused="paused"
+        @playing="playing"
+        @cued="canplay"
+        :player-vars="options"
+        :fitParent="fitParent"
+      ></youtube>
     </div>
     <div
       v-if="currVideo.title"
@@ -39,22 +49,14 @@
       <button class="btn btn-volume" @click="toggleMute">
         <img v-if="isMuted" class="btn-icon" src="assets/images/sound_off.svg">
         <img v-else class="btn-icon" src="assets/images/sound_on.svg">
-        <!-- <volume
-          class="volume-slider"
-          min="0"
-          max="1"
-          step="0.1"
-          @input="draggingVolume"
-          @change="changeVolume"
-          v-model="currVolume"
-          :class="{active: isVolume}"
-        ></volume> -->
       </button>
     </div>
   </div>
 </template>
 
 <script>
+import Vue from "vue";
+import VueYoutube from "vue-youtube";
 import VueDPlayer from "vue-dplayer";
 import "vue-dplayer/dist/vue-dplayer.css";
 import axios from "axios";
@@ -62,12 +64,15 @@ import store from "@/store.js";
 // import posed from 'vue-pose';
 import RangeSlider from "vue-range-slider";
 import "vue-range-slider/dist/vue-range-slider.css";
+import { setTimeout } from "timers";
+
+Vue.use(VueYoutube);
 
 export default {
   name: "VideoPlayer",
   components: {
     "d-player": VueDPlayer,
-    "progress-dot": RangeSlider,
+    "progress-dot": RangeSlider
     // volume: RangeSlider
   },
   props: {
@@ -75,6 +80,8 @@ export default {
   },
   data() {
     return {
+      interval: "",
+      fitParent: true,
       currVolume: 0,
       isVolume: false,
       progressValue: 0,
@@ -82,44 +89,71 @@ export default {
       dragTime: 0,
       leftPosition: "10%",
       currVideo: String,
-      isPaused: false,
+      isPaused: true,
       isMuted: true,
       duration: 0,
       currTime: 0,
       options: {
-        autoplay: false,
-        volume: 0.0
+        autoplay: 0,
+        controls: 0,
+        rel: 0
       }
     };
   },
   computed: {
-    progressWidth: function() {
+    progressWidth() {
       let percentage = parseInt((this.currTime / this.duration) * 10000) / 100;
       // return 'calc(' + percentage + '% - ' + percentage * 0.02 + 'rem)'
       return percentage + "%";
+    },
+    player() {
+      return this.$refs.youtube.player;
     }
   },
   methods: {
-    errorHandling() {
-      console.log('retrying')
-      this.loadVideo(this.currVideo, false)
-    },
-    draggingVolume() {
-      const player = this.$refs.player.dp;
+    canplay() {
+      console.log("LOADED");
 
-      if (this.currVolume == 0) {
-        this.isMuted = true;
-        console.log(this.currVolume);
-      } else {
-        this.isMuted = false;
+      setTimeout(() => {
+        this.$parent.$refs.thumbnails.activateByID(this.currVideo.id);
+        this.isDragging = false;
+        this.dragPosition = "0%";
+        this.dragTime = 0;
+      }, 500);
+
+      this.player.playVideo();
+    },
+    paused() {
+      if (this.interval != '') {
+        console.log('clearing interval', this.interval)
+        window.clearInterval(this.interval);
+        this.interval = "";
+      }
+    },
+    playing() {
+      this.isPaused = false;
+      console.log("is playing");
+      this.$refs.youtube.player.getDuration().then(response => {
+        this.duration = response;
+      });
+
+
+      if (this.interval != '') {
+        console.log('clearing interval', this.interval)
+        window.clearInterval(this.interval);
+        this.interval = "";
       }
 
-      player.volume(this.currVolume);
-    },
-    changeVolume() {
-      const player = this.$refs.player.dp;
+      this.interval = window.setInterval(() => {
+        this.$refs.youtube.player.getCurrentTime().then(response => {
+          this.currTime = response;
 
-      player.volume(this.currVolume);
+          if (this.isDragging == false)
+            this.progressValue =
+              parseInt((this.currTime / this.duration) * 10000) / 100;
+        });
+      }, 500);
+      console.log('got interval', this.interval)
     },
     draggingProgress() {
       this.isDragging = true;
@@ -127,12 +161,9 @@ export default {
     changeProgress() {
       this.isDragging = false;
 
-      const player = this.$refs.player.dp;
-
       let time = (this.progressValue / 100) * this.duration;
       console.log(time);
-
-      player.seek(time);
+      this.player.seekTo(time);
     },
     updateDragPosition(event) {
       let percentage = parseFloat(event) / 100;
@@ -151,39 +182,25 @@ export default {
       return randomLeft;
     },
     mute() {
-      const player = this.$refs.player.dp;
-      player.volume(0);
+      this.player.setVolume(0);
     },
     unmute() {
-      const player = this.$refs.player.dp;
-      player.volume(100);
+      this.player.setVolume(100);
     },
     pauseVideo() {
-      const player = this.$refs.player.dp;
-      player.pause();
+      this.player.pauseVideo();
     },
     playVideo() {
-      const player = this.$refs.player.dp;
-      player.play();
+      this.player.playVideo();
     },
     playMuted() {
-      const player = this.$refs.player.dp;
-      player.volume(0);
-      this.currVolume = 0;
-      player.play();
+      this.mute()
+      this.playVideo()
       this.isMuted = true;
     },
     playWithSound() {
-      const player = this.$refs.player.dp;
-
-      if (this.currVolume > 0) {
-        player.volume(this.currVolume);
-      } else {
-        player.volume(1);
-        this.currVolume = 1;
-      }
-
-      player.play();
+      this.unmute()
+      this.playVideo()
       this.isMuted = false;
     },
     togglePause() {
@@ -195,10 +212,9 @@ export default {
         this.playVideo();
       }
     },
-    toggleVolume() {
-      this.isVolume = !this.isVolume;
-      
-    },
+    // toggleVolume() {
+    //   this.isVolume = !this.isVolume;
+    // },
     toggleMute() {
       this.isMuted = !this.isMuted;
 
@@ -208,35 +224,12 @@ export default {
         this.unmute();
       }
     },
-    setVideoUrl(url) {
-      const player = this.$refs.player.dp;
-      try {
-        player.switchVideo({
-          url: url
-        });
-        console.log('switched')
-      } catch (error) {
-        console.log(error)
-      }
-    },
     playbackEnded() {
-      let tid = this.$parent.$refs.thumbnails.getNextVideoId(this.currVideo.id)
+      let tid = this.$parent.$refs.thumbnails.getNextVideoId(this.currVideo.id);
 
       store.dispatch("getVideoById", tid).then(response => {
-        this.currVideo = response;
-        console.log(this.currVideo.id)
         this.loadVideo(response, false);
       });
-    },
-    timeUpdate() {
-      const player = this.$refs.player.dp;
-      this.duration = player.video.duration;
-      this.currTime = player.video.currentTime;
-
-      if (this.isDragging == false) {
-        this.progressValue =
-          parseInt((this.currTime / this.duration) * 10000) / 100;
-      }
     },
     filterTime(seconds) {
       if (seconds) {
@@ -252,47 +245,14 @@ export default {
       }
     },
     loadVideo(video, sound) {
-      console.log(video);
-      // let url = "http://wl-schermen_INLINE.test/ytdl/getvideo.php?videoid=" + video.id + "&type=Download&format=ipad"
+      this.currVideo = video;
 
-      // let url = "http://wl-schermen.test/yt-link.php?id=" + video.id;
-      let url = "http://onzebuurtinbeeld.nl/wl-schermen/yt-link.php?id=" + video.id;
-
-      axios.get(url).then(response => {
-        console.log("got response");
-        let feeds = Array.from(response.data);
-        console.log(response.data);
-        let videoUrl = "";
-
-        feeds.forEach(video => {
-          console.log(video);
-
-          if (video.mime === "video/mp4") {
-            videoUrl = video.url;
-          }
-        });
-
-        console.log(videoUrl);
-        
-        if (videoUrl !== "") {
-          this.setVideoUrl(videoUrl);
-          this.currVideo = video;
-          this.leftPosition = this.getLeftPosition();
-
-          setTimeout(() => {
-              this.$parent.$refs.thumbnails.activateByID(video.id);
-            this.isDragging = false;
-            this.dragPosition = "0%";
-            this.dragTime = 0;
-
-            if (sound) {
-              this.playWithSound();
-            } else {
-              this.playMuted();
-            }
-          }, 1000);
-        }
-      });
+      setTimeout(() => {
+        this.$parent.$refs.thumbnails.activateByID(video.id);
+        this.isDragging = false;
+        this.dragPosition = "0%";
+        this.dragTime = 0;
+      }, 500);
     }
   },
   mounted() {
@@ -303,7 +263,7 @@ export default {
 
         store.dispatch("getVideo", 0).then(response => {
           this.currVideo = response;
-          this.loadVideo(response, false);
+          console.log(response);
         });
       }
     }, 100);
