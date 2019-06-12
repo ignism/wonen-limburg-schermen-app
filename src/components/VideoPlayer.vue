@@ -121,6 +121,8 @@ export default {
         this.dragTime = 0;
       }, 500);
 
+      this.leftPosition = this.getLeftPosition();
+
       this.player.playVideo();
     },
     paused() {
