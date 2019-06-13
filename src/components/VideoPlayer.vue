@@ -10,7 +10,6 @@
         @playing="playing"
         @cued="canplay"
         :player-vars="options"
-        :fitParent="fitParent"
       ></youtube>
     </div>
     <div
@@ -57,9 +56,7 @@
 <script>
 import Vue from "vue";
 import VueYoutube from "vue-youtube";
-import VueDPlayer from "vue-dplayer";
 import "vue-dplayer/dist/vue-dplayer.css";
-import axios from "axios";
 import store from "@/store.js";
 // import posed from 'vue-pose';
 import RangeSlider from "vue-range-slider";
@@ -71,7 +68,6 @@ Vue.use(VueYoutube);
 export default {
   name: "VideoPlayer",
   components: {
-    "d-player": VueDPlayer,
     "progress-dot": RangeSlider
     // volume: RangeSlider
   },
@@ -275,6 +271,12 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style>
+
+iframe {
+  width: 100%;
+  height: 100%;
+}
+
 .btn-volume {
   position: relative;
 }
